@@ -1,0 +1,257 @@
+{% extends "base_simple.html" %}
+
+{% block content %}
+<!-- Guía de inicio -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-graduation-cap"></i> ¿Cómo funciona el juego?</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="step-card">
+                            <span class="step-number">1</span>
+                            <strong>Agregar Jugadores</strong><br>
+                            <small>Máximo 20 jugadores. Cada uno recibirá 2 caramelos aleatorios.</small>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">2</span>
+                            <strong>Fase 1: Supervivencia</strong><br>
+                            <small>1 caramelo = 1 chupetín. ¡Todos necesitan al menos un chupetín!</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="step-card">
+                            <span class="step-number">3</span>
+                            <strong>Fase 2: Competencia</strong><br>
+                            <small>2 de cada tipo = 1 chupetín. Se forman grupos y compiten.</small>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">4</span>
+                            <strong>Resultados</strong><br>
+                            <small>El grupo con más chupetines gana.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estado del juego -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-gamepad"></i> Estado del Juego</h3>
+            </div>
+            <div class="card-body">
+                {% if game %}
+                    <!-- Indicador de progreso -->
+                    <div class="progress-indicator">
+                        <div class="progress-step {% if game.status == 'setup' %}active{% else %}completed{% endif %}">
+                            <i class="fas fa-cog"></i> Configuración
+                        </div>
+                        <div class="progress-step {% if game.status == 'phase1' %}active{% elif game.status in ['phase2', 'finished'] %}completed{% else %}pending{% endif %}">
+                            <i class="fas fa-exchange-alt"></i> Fase 1
+                        </div>
+                        <div class="progress-step {% if game.status == 'phase2' %}active{% elif game.status == 'finished' %}completed{% else %}pending{% endif %}">
+                            <i class="fas fa-users"></i> Fase 2
+                        </div>
+                        <div class="progress-step {% if game.status == 'finished' %}active{% else %}pending{% endif %}">
+                            <i class="fas fa-trophy"></i> Resultados
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Información del Juego</h5>
+                            <p><strong>Jugadores registrados:</strong> {{ game.players|length }}/20</p>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-info" style="width: {{ (game.players|length / 20 * 100)|round(1) }}%">
+                                    {{ game.players|length }}/20
+                                </div>
+                            </div>
+                            
+                            {% if game.players|length < 2 %}
+                            <div class="alert alert-warning">
+                                ⚠️ Se necesitan al menos 2 jugadores para comenzar
+                            </div>
+                            {% elif game.players|length >= 20 %}
+                            <div class="alert alert-success">
+                                ✅ ¡Cupo completo! Listos para empezar
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Acciones</h5>
+                            {% if game.status == 'setup' %}
+                                {% if game.players|length >= 2 %}
+                                <a href="{{ url_for('start_phase1') }}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-play"></i> 🚀 ¡Comenzar Fase 1!
+                                </a>
+                                {% else %}
+                                <button class="btn btn-secondary btn-lg" disabled>
+                                    <i class="fas fa-play"></i> Comenzar Fase 1
+                                </button>
+                                <small class="text-muted d-block">Agrega más jugadores primero</small>
+                                {% endif %}
+                            {% elif game.status == 'phase1' %}
+                                <a href="{{ url_for('game') }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-exchange-alt"></i> Continuar Fase 1
+                                </a>
+                            {% elif game.status == 'phase2' %}
+                                <a href="{{ url_for('phase2') }}" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-users"></i> Continuar Fase 2
+                                </a>
+                            {% elif game.status == 'finished' %}
+                                <a href="{{ url_for('results') }}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-trophy"></i> Ver Resultados
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                        <h4>No hay juego activo</h4>
+                        <p>Crea un nuevo juego para comenzar</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Agregar jugadores (solo si hay juego activo y está en setup) -->
+        {% if game and game.status == 'setup' %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-user-plus"></i> Agregar Jugadores</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_player') }}">
+                    <div class="input-group mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Nombre del jugador" required maxlength="20">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Lista de jugadores -->
+        {% if game and game.players %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4><i class="fas fa-users"></i> Jugadores Registrados ({{ game.players|length }})</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for player_name, player in game.players.items() %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                        <div class="player-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>{{ player.name }}</strong>
+                                {% if not player.is_qualified %}
+                                    <span class="badge bg-danger">Descalificado</span>
+                                {% elif player.group_number %}
+                                    <span class="badge bg-info">Grupo {{ player.group_number }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Activo</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if game.status != 'setup' %}
+                            <div class="candy-inventory mt-2">
+                                <div class="candy-item">
+                                    <span class="candy-count text-warning">{{ player.limon_count }}</span>
+                                    <small>🍋</small>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-info">{{ player.huevo_count }}</span>
+                                    <small>🥚</small>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-success">{{ player.pera_count }}</span>
+                                    <small>🍐</small>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-danger">{{ player.chupetin_count }}</span>
+                                    <small>🍭</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="fas fa-cog"></i> Control del Juego</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('new_game') }}">
+                    <button type="submit" class="btn btn-warning w-100 mb-3" onclick="return confirm('¿Crear un nuevo juego? Se perderá el progreso actual.')">
+                        <i class="fas fa-plus"></i> Nuevo Juego
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información educativa -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-lightbulb"></i> Tipos de Caramelos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="candy-icon">🍋</div>
+                        <small><strong>Limón</strong></small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="candy-icon">🥚</div>
+                        <small><strong>Huevo</strong></small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="candy-icon">🍐</div>
+                        <small><strong>Pera</strong></small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="candy-icon">🍭</div>
+                        <small><strong>Chupetín</strong></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reglas resumidas -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-book"></i> Reglas Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="formula-box">
+                    <strong>Fase 1:</strong><br>
+                    🍋 o 🥚 o 🍐 → 🍭
+                </div>
+                <div class="formula-box">
+                    <strong>Fase 2:</strong><br>
+                    2🍋 + 2🥚 + 2🍐 → 🍭
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

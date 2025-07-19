@@ -1,0 +1,331 @@
+{% extends "base_simple.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Banners de resultados -->
+        {% set group1_players = [] %}
+        {% set group2_players = [] %}
+        {% for player_name, player in game.players.items() %}
+            {% if player.is_qualified and player.group_number == 1 %}
+                {% set _ = group1_players.append(player) %}
+            {% elif player.is_qualified and player.group_number == 2 %}
+                {% set _ = group2_players.append(player) %}
+            {% endif %}
+        {% endfor %}
+
+        {% set group1_chupetines = group1_players|sum(attribute='chupetin_count') %}
+        {% set group2_chupetines = group2_players|sum(attribute='chupetin_count') %}
+
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white text-center">
+                <h2><i class="fas fa-trophy"></i> 🎉 RESULTADOS FINALES 🎉</h2>
+            </div>
+            <div class="card-body">
+                <!-- Ganador -->
+                <div class="text-center mb-4">
+                    {% if group1_chupetines > group2_chupetines %}
+                        <div class="alert alert-success" style="font-size: 1.5em;">
+                            <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                            <h3><strong>🏆 ¡GRUPO 1 GANADOR! 🏆</strong></h3>
+                            <p>{{ group1_chupetines }} chupetines vs {{ group2_chupetines }} chupetines</p>
+                            <small>Ventaja de {{ group1_chupetines - group2_chupetines }} chupetines</small>
+                        </div>
+                    {% elif group2_chupetines > group1_chupetines %}
+                        <div class="alert alert-info" style="font-size: 1.5em;">
+                            <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                            <h3><strong>🏆 ¡GRUPO 2 GANADOR! 🏆</strong></h3>
+                            <p>{{ group2_chupetines }} chupetines vs {{ group1_chupetines }} chupetines</p>
+                            <small>Ventaja de {{ group2_chupetines - group1_chupetines }} chupetines</small>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning" style="font-size: 1.5em;">
+                            <i class="fas fa-handshake fa-2x text-warning mb-2"></i>
+                            <h3><strong>🤝 ¡EMPATE PERFECTO! 🤝</strong></h3>
+                            <p>Ambos grupos: {{ group1_chupetines }} chupetines</p>
+                            <small>¡Excelente trabajo en equipo!</small>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Marcador final -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card {% if group1_chupetines >= group2_chupetines %}bg-success{% else %}bg-primary{% endif %} text-white">
+                            <div class="card-body text-center">
+                                <h3><i class="fas fa-users"></i> GRUPO 1</h3>
+                                <div style="font-size: 4em; margin: 20px 0;">
+                                    {{ group1_chupetines }} 🍭
+                                </div>
+                                <h5>{{ group1_players|length }} jugadores</h5>
+                                {% if group1_chupetines > group2_chupetines %}
+                                    <i class="fas fa-trophy fa-3x text-warning mt-3"></i>
+                                    <div class="mt-2"><strong>🎉 CAMPEONES 🎉</strong></div>
+                                {% elif group1_chupetines == group2_chupetines %}
+                                    <i class="fas fa-medal fa-3x text-warning mt-3"></i>
+                                    <div class="mt-2"><strong>🤝 EMPATE 🤝</strong></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card {% if group2_chupetines >= group1_chupetines %}bg-success{% else %}bg-info{% endif %} text-white">
+                            <div class="card-body text-center">
+                                <h3><i class="fas fa-users"></i> GRUPO 2</h3>
+                                <div style="font-size: 4em; margin: 20px 0;">
+                                    {{ group2_chupetines }} 🍭
+                                </div>
+                                <h5>{{ group2_players|length }} jugadores</h5>
+                                {% if group2_chupetines > group1_chupetines %}
+                                    <i class="fas fa-trophy fa-3x text-warning mt-3"></i>
+                                    <div class="mt-2"><strong>🎉 CAMPEONES 🎉</strong></div>
+                                {% elif group2_chupetines == group1_chupetines %}
+                                    <i class="fas fa-medal fa-3x text-warning mt-3"></i>
+                                    <div class="mt-2"><strong>🤝 EMPATE 🤝</strong></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles por grupo -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header {% if group1_chupetines >= group2_chupetines %}bg-success{% else %}bg-primary{% endif %} text-white">
+                        <h4><i class="fas fa-users"></i> Grupo 1 - Detalle Final</h4>
+                    </div>
+                    <div class="card-body">
+                        {% for player in group1_players %}
+                        <div class="player-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6><strong>{{ player.name }}</strong></h6>
+                                {% if player.chupetin_count > 0 %}
+                                    <span class="badge bg-success">{{ player.chupetin_count }} 🍭</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">0 🍭</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="candy-inventory">
+                                <div class="candy-item">
+                                    <span class="candy-count text-warning">{{ player.limon_count }}</span>
+                                    <div>🍋</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-info">{{ player.huevo_count }}</span>
+                                    <div>🥚</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-success">{{ player.pera_count }}</span>
+                                    <div>🍐</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-danger">{{ player.chupetin_count }}</span>
+                                    <div>🍭</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="text-center">
+                            <h5 class="text-primary">Total del Grupo: {{ group1_chupetines }} 🍭</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header {% if group2_chupetines >= group1_chupetines %}bg-success{% else %}bg-info{% endif %} text-white">
+                        <h4><i class="fas fa-users"></i> Grupo 2 - Detalle Final</h4>
+                    </div>
+                    <div class="card-body">
+                        {% for player in group2_players %}
+                        <div class="player-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6><strong>{{ player.name }}</strong></h6>
+                                {% if player.chupetin_count > 0 %}
+                                    <span class="badge bg-success">{{ player.chupetin_count }} 🍭</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">0 🍭</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="candy-inventory">
+                                <div class="candy-item">
+                                    <span class="candy-count text-warning">{{ player.limon_count }}</span>
+                                    <div>🍋</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-info">{{ player.huevo_count }}</span>
+                                    <div>🍐</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-success">{{ player.pera_count }}</span>
+                                    <div>🍐</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-danger">{{ player.chupetin_count }}</span>
+                                    <div>🍭</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="text-center">
+                            <h5 class="text-info">Total del Grupo: {{ group2_chupetines }} 🍭</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jugadores descalificados -->
+        {% set descalificados = [] %}
+        {% for player_name, player in game.players.items() %}
+            {% if not player.is_qualified %}
+                {% set _ = descalificados.append(player) %}
+            {% endif %}
+        {% endfor %}
+
+        {% if descalificados %}
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="fas fa-exclamation-triangle"></i> Jugadores Descalificados</h4>
+            </div>
+            <div class="card-body">
+                <p>Los siguientes jugadores no lograron clasificar a la Fase 2:</p>
+                <div class="row">
+                    {% for player in descalificados %}
+                    <div class="col-md-4 mb-2">
+                        <div class="alert alert-danger">
+                            <strong>{{ player.name }}</strong><br>
+                            <small>No consiguió chupetines en la Fase 1</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Estadísticas del juego -->
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white">
+                <h4><i class="fas fa-chart-bar"></i> Estadísticas del Juego</h4>
+            </div>
+            <div class="card-body">
+                {% set total_exchanges = game.exchanges|length %}
+                {% set total_chupetines = game.players.values()|sum(attribute='chupetin_count') %}
+                {% set total_players = game.players|length %}
+                {% set qualified_players = group1_players|length + group2_players|length %}
+
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="text-primary">{{ total_players }}</h3>
+                                <small>Jugadores Totales</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="text-success">{{ qualified_players }}</h3>
+                                <small>Clasificaron a Fase 2</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="text-warning">{{ total_chupetines }}</h3>
+                                <small>Chupetines Totales</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="text-info">{{ total_exchanges }}</h3>
+                                <small>Intercambios Realizados</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reflexión educativa -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="fas fa-graduation-cap"></i> Reflexión Educativa</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>🎯 Objetivos Cumplidos:</h5>
+                        <ul>
+                            <li><strong>Colaboración:</strong> Aprendieron a trabajar en equipo</li>
+                            <li><strong>Negociación:</strong> Practicaron el intercambio y la estrategia</li>
+                            <li><strong>Adaptación:</strong> Se ajustaron a diferentes reglas entre fases</li>
+                            <li><strong>Competencia sana:</strong> Compitieron respetando las reglas</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>💡 Lecciones Aprendidas:</h5>
+                        <ul>
+                            <li><strong>Planificación:</strong> La estrategia es importante</li>
+                            <li><strong>Comunicación:</strong> Hablar con el equipo es clave</li>
+                            <li><strong>Flexibilidad:</strong> Las reglas pueden cambiar</li>
+                            <li><strong>Solidaridad:</strong> A veces hay que ayudar a otros</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+            <a href="{{ url_for('new_game') }}" class="btn btn-success btn-lg" onclick="return confirm('¿Crear un nuevo juego?')">
+                <i class="fas fa-plus"></i> Nuevo Juego
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Confetti animation for celebration
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple celebration effect
+    const winners = document.querySelectorAll('.fa-trophy');
+    winners.forEach(trophy => {
+        trophy.style.animation = 'bounce 1s infinite';
+    });
+});
+
+// Add CSS for bounce animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

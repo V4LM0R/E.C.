@@ -1,0 +1,289 @@
+{% extends "base_simple.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-exchange-alt"></i> Fase 1: Intercambio de Caramelos</h3>
+                <a href="{{ url_for('end_phase1') }}" class="btn btn-warning" onclick="return confirm('¿Terminar la Fase 1 y pasar a la Fase 2?')">
+                    <i class="fas fa-arrow-right"></i> Terminar Fase 1
+                </a>
+            </div>
+            <div class="card-body">
+                <!-- Reglas de la fase 1 -->
+                <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1">📋 Reglas de la Fase 1</h6>
+                            <p class="mb-1"><strong>Intercambio:</strong> 1 caramelo = 1 chupetín</p>
+                            <p class="mb-0"><strong>⚠️ Importante:</strong> Los jugadores sin chupetín quedan descalificados</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fórmula visual -->
+                <div class="formula-box">
+                    <h5>🔄 Fórmula de Intercambio Fase 1</h5>
+                    <div style="font-size: 2em; margin: 15px 0;">
+                        🍋 o 🥚 o 🍐 <span style="color: #28a745;">→</span> 🍭
+                    </div>
+                    <small>Cualquier caramelo se convierte en un chupetín</small>
+                </div>
+
+                <!-- Formulario de intercambio -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-handshake"></i> Realizar Intercambio entre Jugadores</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('exchange_candy') }}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="form-label"><strong>Jugador que da:</strong></label>
+                                    <select name="from_player" class="form-select" required>
+                                        <option value="">-- Seleccionar jugador --</option>
+                                        {% for player_name, player in game.players.items() %}
+                                        <option value="{{ player_name }}">{{ player_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label"><strong>Jugador que recibe:</strong></label>
+                                    <select name="to_player" class="form-select" required>
+                                        <option value="">-- Seleccionar jugador --</option>
+                                        {% for player_name, player in game.players.items() %}
+                                        <option value="{{ player_name }}">{{ player_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label"><strong>Tipo de caramelo:</strong></label>
+                                    <select name="candy_type" class="form-select" required>
+                                        <option value="">-- Seleccionar caramelo --</option>
+                                        <option value="limon">🍋 Limón</option>
+                                        <option value="huevo">🥚 Huevo</option>
+                                        <option value="pera">🍐 Pera</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-exchange-alt"></i> Realizar Intercambio
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lista de jugadores con sus caramelos -->
+                <h4><i class="fas fa-users"></i> Jugadores y sus Caramelos</h4>
+                <div class="row">
+                    {% for player_name, player in game.players.items() %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="player-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0"><strong>{{ player_name }}</strong></h6>
+                                {% if player.chupetin_count > 0 %}
+                                    <span class="badge bg-success">✅ Clasificado</span>
+                                {% else %}
+                                    <span class="badge bg-warning">⚠️ Sin chupetín</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Inventario de caramelos -->
+                            <div class="candy-inventory">
+                                <div class="candy-item">
+                                    <span class="candy-count text-warning">{{ player.limon_count }}</span>
+                                    <div>🍋 Limón</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-info">{{ player.huevo_count }}</span>
+                                    <div>🥚 Huevo</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-success">{{ player.pera_count }}</span>
+                                    <div>🍐 Pera</div>
+                                </div>
+                                <div class="candy-item">
+                                    <span class="candy-count text-danger">{{ player.chupetin_count }}</span>
+                                    <div>🍭 Chupetín</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Botones para convertir caramelos -->
+                            <div class="mt-3">
+                                <small class="text-muted d-block mb-2">💡 Convertir caramelos a chupetines:</small>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    {% if player.limon_count > 0 %}
+                                    <form method="POST" action="{{ url_for('make_chupetin') }}" style="display: inline;">
+                                        <input type="hidden" name="player_name" value="{{ player_name }}">
+                                        <input type="hidden" name="candy_type" value="limon">
+                                        <button type="submit" class="btn btn-outline-warning btn-sm btn-action" title="Convertir limón a chupetín">
+                                            🍋→🍭
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    
+                                    {% if player.huevo_count > 0 %}
+                                    <form method="POST" action="{{ url_for('make_chupetin') }}" style="display: inline;">
+                                        <input type="hidden" name="player_name" value="{{ player_name }}">
+                                        <input type="hidden" name="candy_type" value="huevo">
+                                        <button type="submit" class="btn btn-outline-info btn-sm btn-action" title="Convertir huevo a chupetín">
+                                            🥚→🍭
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    
+                                    {% if player.pera_count > 0 %}
+                                    <form method="POST" action="{{ url_for('make_chupetin') }}" style="display: inline;">
+                                        <input type="hidden" name="player_name" value="{{ player_name }}">
+                                        <input type="hidden" name="candy_type" value="pera">
+                                        <button type="submit" class="btn btn-outline-success btn-sm btn-action" title="Convertir pera a chupetín">
+                                            🍐→🍭
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                
+                                {% set total_candies = player.limon_count + player.pera_count + player.huevo_count %}
+                                {% if total_candies == 0 and player.chupetin_count == 0 %}
+                                <div class="alert alert-danger mt-2 p-2">
+                                    <small>⚠️ ¡Sin caramelos ni chupetines! Está en peligro de descalificación.</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral con estadísticas -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-chart-bar"></i> Estadísticas de la Fase 1</h5>
+            </div>
+            <div class="card-body">
+                {% set total_players = game.players|length %}
+                {% set players_with_chupetin = game.players.values()|selectattr('chupetin_count', 'gt', 0)|list|length %}
+                {% set total_limon = game.players.values()|sum(attribute='limon_count') %}
+                {% set total_huevo = game.players.values()|sum(attribute='huevo_count') %}
+                {% set total_pera = game.players.values()|sum(attribute='pera_count') %}
+                {% set total_chupetines = game.players.values()|sum(attribute='chupetin_count') %}
+                
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <h4 class="text-primary">{{ total_players }}</h4>
+                                <small>Total Jugadores</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <h4 class="text-success">{{ players_with_chupetin }}</h4>
+                                <small>Con Chupetín</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <h5 class="text-warning">{{ total_limon }}</h5>
+                                <small>🍋 Total</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <h5 class="text-info">{{ total_huevo }}</h5>
+                                <small>🥚 Total</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <h5 class="text-success">{{ total_pera }}</h5>
+                                <small>🍐 Total</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <div class="card bg-warning">
+                        <div class="card-body py-2">
+                            <h4>{{ total_chupetines }}</h4>
+                            <small>🍭 Chupetines Totales</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progreso hacia la clasificación -->
+                <div class="mt-3">
+                    <h6>Progreso de Clasificación:</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ (players_with_chupetin / total_players * 100)|round(1) }}%">
+                            {{ (players_with_chupetin / total_players * 100)|round(1) }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ players_with_chupetin }} de {{ total_players }} jugadores clasificados</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimos intercambios -->
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-history"></i> Últimos Intercambios</h5>
+            </div>
+            <div class="card-body">
+                {% if game.exchanges %}
+                    {% for exchange in game.exchanges[-5:] %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <small>
+                            <strong>{{ exchange.from }}</strong> → <strong>{{ exchange.to }}</strong>
+                        </small>
+                        <span class="badge bg-primary">
+                            {% if exchange.candy == 'limon' %}🍋
+                            {% elif exchange.candy == 'huevo' %}🥚
+                            {% elif exchange.candy == 'pera' %}🍐
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No hay intercambios aún</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Consejos -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-lightbulb"></i> Consejos Estratégicos</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>💡 <strong>Negocia:</strong> Intercambia para ayudar a otros a conseguir chupetines</li>
+                    <li>⚠️ <strong>Prioridad:</strong> Asegúrate de tener al menos un chupetín</li>
+                    <li>🤝 <strong>Colabora:</strong> Todos deben clasificar para la Fase 2</li>
+                    <li>⏰ <strong>Tiempo:</strong> No hay límite de tiempo, planifica bien</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
