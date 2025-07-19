@@ -1,0 +1,55 @@
+GUÍA DE INSTALACIÓN COMPLETA - APLICACIÓN ACM
+
+Para ejecutar esta aplicación en tu entorno local (Visual Studio Code, PyCharm, etc.), sigue estos pasos:
+
+=== PASO 1: INSTALACIÓN DE DEPENDENCIAS ===
+
+Abre una terminal en la carpeta del proyecto y ejecuta UNO de estos comandos:
+
+OPCIÓN A - Instalación individual (recomendada):
+pip install Flask
+pip install pandas
+pip install numpy
+pip install scikit-learn
+pip install matplotlib
+pip install seaborn
+pip install openpyxl
+pip install Werkzeug
+
+OPCIÓN B - Instalación en una línea:
+pip install Flask pandas numpy scikit-learn matplotlib seaborn openpyxl Werkzeug
+
+OPCIÓN C - Con versiones específicas:
+pip install Flask==3.0.0 pandas==2.1.4 numpy==1.25.2 scikit-learn==1.3.2 matplotlib==3.8.2 seaborn==0.13.0 openpyxl==3.1.2 Werkzeug==3.0.1
+
+=== VERIFICACIÓN DE INSTALACIÓN ===
+
+Para verificar que openpyxl está instalado correctamente, ejecuta en Python:
+python -c "import openpyxl; print('openpyxl instalado correctamente')"
+
+Si aparece algún error, ejecuta específicamente:
+pip install --upgrade openpyxl
+
+=== PASO 2: EJECUCIÓN ===
+
+1. Navega a la carpeta del proyecto en tu terminal
+2. Ejecuta: python app.py
+3. Abre tu navegador en: http://localhost:5000
+
+=== SOLUCIÓN DE PROBLEMAS ===
+
+Si sigue apareciendo el error "Missing optional dependency 'openpyxl'":
+1. Verifica que estés usando el mismo entorno Python donde instalaste las dependencias
+2. Si usas un entorno virtual, asegúrate de que esté activado
+3. Reinstala openpyxl: pip uninstall openpyxl && pip install openpyxl
+4. Verifica la instalación: pip show openpyxl
+
+=== ARCHIVOS NECESARIOS ===
+
+Asegúrate de tener estos archivos en tu proyecto:
+- app.py (servidor principal)
+- templates/ (carpeta con archivos HTML)
+- static/ (carpeta con CSS y otros archivos)
+- uploads/ (carpeta para archivos subidos - créala si no existe)
+
+NOTA: La dependencia 'openpyxl' es OBLIGATORIA para procesar archivos Excel (.xlsx)

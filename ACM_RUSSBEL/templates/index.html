@@ -1,0 +1,622 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="fade-in">Análisis de Correspondencia Multivariado</h1>
+        <p class="lead fade-in">Descubre patrones ocultos en tus datos categóricos con ACM</p>
+        <a href="#que-es-acm" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-play me-2"></i>Empezar a Aprender
+        </a>
+        <a href="{{ url_for('acm_tool') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-tools me-2"></i>Iniciar Prueba ACM
+        </a>
+    </div>
+</section>
+
+<!-- ¿Qué es el ACM? -->
+<div class="container">
+    <div class="info-card slide-up" id="que-es-acm">
+        <h2>
+            <i class="fas fa-question-circle card-icon"></i>
+            ¿Qué es el Análisis de Correspondencia Múltiple?
+        </h2>
+        <p>
+            El <strong>Análisis de Correspondencia Múltiple (ACM)</strong> es una técnica estadística multivariada 
+            que permite explorar las relaciones entre múltiples variables categóricas. Es una extensión del análisis 
+            de correspondencia simple que trabaja con más de dos variables.
+        </p>
+        <p>
+            Esta técnica es especialmente útil para:
+        </p>
+        <ul class="list-unstyled">
+            <li><i class="fas fa-check text-success me-2"></i>Identificar patrones en encuestas y cuestionarios</li>
+            <li><i class="fas fa-check text-success me-2"></i>Analizar perfiles de consumidores</li>
+            <li><i class="fas fa-check text-success me-2"></i>Estudiar comportamientos sociales</li>
+            <li><i class="fas fa-check text-success me-2"></i>Reducir la dimensionalidad de datos categóricos</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Ejemplo práctico:</strong> Imagina que tienes datos sobre preferencias de comida, edad y ciudad de residencia. 
+            El ACM te ayudaría a descubrir que las personas jóvenes de cierta ciudad prefieren comida rápida.
+        </div>
+    </div>
+
+    <!-- Fundamentos Matemáticos -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-calculator card-icon"></i>
+            Fundamentos Matemáticos y Conceptuales
+        </h2>
+        <p>
+            El ACM se basa en la <strong>descomposición en valores singulares</strong> de una matriz de indicadores. 
+            Matemáticamente, transforma variables categóricas en un espacio continuo de menor dimensión.
+        </p>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4 class="text-success"><i class="fas fa-cogs me-2"></i>Proceso Principal</h4>
+                <ol>
+                    <li><strong>Codificación:</strong> Las variables categóricas se convierten en variables dummy (0 y 1)</li>
+                    <li><strong>Matriz de correspondencia:</strong> Se calcula la matriz de frecuencias relativas</li>
+                    <li><strong>Descomposición:</strong> Se aplica la descomposición en valores singulares</li>
+                    <li><strong>Proyección:</strong> Los datos se proyectan en un espacio de menor dimensión</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-success"><i class="fas fa-chart-line me-2"></i>Conceptos Clave</h4>
+                <ul>
+                    <li><strong>Inercia:</strong> Medida de la variabilidad total en los datos</li>
+                    <li><strong>Componentes:</strong> Ejes que explican la mayor varianza</li>
+                    <li><strong>Contribuciones:</strong> Peso de cada variable en cada componente</li>
+                    <li><strong>Coordenadas:</strong> Posición de cada observación en el nuevo espacio</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtemas -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="info-card slide-up">
+                <h3>
+                    <i class="fas fa-search text-success me-2"></i>
+                    Interpretación de Resultados
+                </h3>
+                <p>Los resultados del ACM se interpretan principalmente a través de:</p>
+                <ul>
+                    <li><strong>Gráficos de correspondencia:</strong> Visualización de las relaciones entre categorías</li>
+                    <li><strong>Contribuciones relativas:</strong> Importancia de cada variable en cada dimensión</li>
+                    <li><strong>Proximidad:</strong> Categorías cercanas indican asociación</li>
+                    <li><strong>Ejes principales:</strong> Direcciones de máxima variabilidad</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-card slide-up">
+                <h3>
+                    <i class="fas fa-chart-bar text-success me-2"></i>
+                    Métricas de Evaluación
+                </h3>
+                <p>Para evaluar la calidad del análisis utilizamos:</p>
+                <ul>
+                    <li><strong>Varianza explicada:</strong> Porcentaje de información conservada</li>
+                    <li><strong>Inercia total:</strong> Variabilidad total en los datos</li>
+                    <li><strong>Calidad de representación:</strong> Qué tan bien se representa cada punto</li>
+                    <li><strong>Eigenvalues:</strong> Importancia de cada componente</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-card slide-up">
+                <h3>
+                    <i class="fas fa-balance-scale text-success me-2"></i>
+                    Ventajas y Consideraciones
+                </h3>
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Maneja múltiples variables categóricas</li>
+                    <li>Reduce dimensionalidad</li>
+                    <li>Visualización intuitiva</li>
+                    <li>No requiere distribución normal</li>
+                </ul>
+                <p><strong>Consideraciones:</strong></p>
+                <ul>
+                    <li>Sensible a categorías raras</li>
+                    <li>Interpretación puede ser compleja</li>
+                    <li>Requiere muestra suficiente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minijuego -->
+    <div class="game-container slide-up">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-gamepad me-3"></i>
+            Simulador Interactivo de ACM
+        </h2>
+        <p class="text-center lead">Aprende cómo el ACM encuentra patrones automáticamente en datos categóricos</p>
+        
+        <!-- Tutorial paso a paso -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="tutorial-step">
+                    <div class="step-number">1</div>
+                    <h5>Observa</h5>
+                    <p>Cada persona tiene 3 características: edad, ciudad y hobby</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="tutorial-step">
+                    <div class="step-number">2</div>
+                    <h5>Identifica</h5>
+                    <p>Busca personas que compartan 2 o más características</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="tutorial-step">
+                    <div class="step-number">3</div>
+                    <h5>Agrupa</h5>
+                    <p>Selecciona personas similares haciendo clic en ellas</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="tutorial-step">
+                    <div class="step-number">4</div>
+                    <h5>Verifica</h5>
+                    <p>El ACM haría esto automáticamente con miles de datos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leyenda de características -->
+        <div class="characteristics-legend mb-4">
+            <h5 class="text-center mb-3">
+                <i class="fas fa-key me-2"></i>
+                Leyenda de Características
+            </h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <i class="fas fa-birthday-cake text-primary"></i>
+                        <strong>Edad:</strong>
+                        <span class="badge bg-primary ms-2">Joven (20-30)</span>
+                        <span class="badge bg-warning ms-1">Adulto (40-50)</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <i class="fas fa-map-marker-alt text-success"></i>
+                        <strong>Ciudad:</strong>
+                        <span class="badge bg-success ms-2">Madrid</span>
+                        <span class="badge bg-info ms-1">Barcelona</span>
+                        <span class="badge bg-secondary ms-1">Valencia</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <i class="fas fa-heart text-danger"></i>
+                        <strong>Hobby:</strong>
+                        <span class="badge bg-danger ms-2">Tecnología</span>
+                        <span class="badge bg-dark ms-1">Cultura</span>
+                        <span class="badge bg-warning ms-1">Deporte</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ejemplo visual de grupos objetivo -->
+        <div class="target-groups mb-4">
+            <h5 class="text-center mb-3">
+                <i class="fas fa-bullseye me-2"></i>
+                Grupos Objetivo a Encontrar
+            </h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="target-group group-a">
+                        <div class="group-header">
+                            <i class="fas fa-users"></i>
+                            <strong>Grupo A</strong>
+                        </div>
+                        <div class="group-characteristics">
+                            <span class="char-badge age-young">Jóvenes</span>
+                            <span class="char-badge city-madrid">Madrid</span>
+                            <span class="char-badge hobby-tech">Tecnología</span>
+                        </div>
+                        <div class="group-members">Juan + Ana</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="target-group group-b">
+                        <div class="group-header">
+                            <i class="fas fa-users"></i>
+                            <strong>Grupo B</strong>
+                        </div>
+                        <div class="group-characteristics">
+                            <span class="char-badge age-adult">Adultos</span>
+                            <span class="char-badge city-barcelona">Barcelona</span>
+                            <span class="char-badge hobby-culture">Cultura</span>
+                        </div>
+                        <div class="group-members">Carlos + María</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="target-group group-c">
+                        <div class="group-header">
+                            <i class="fas fa-users"></i>
+                            <strong>Grupo C</strong>
+                        </div>
+                        <div class="group-characteristics">
+                            <span class="char-badge age-young">Jóvenes</span>
+                            <span class="char-badge city-valencia">Valencia</span>
+                            <span class="char-badge hobby-sport">Deporte</span>
+                        </div>
+                        <div class="group-members">Luis + Sara</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-board">
+            <h4 class="text-center mb-3">
+                <i class="fas fa-mouse-pointer me-2"></i>
+                Selecciona personas del mismo grupo
+            </h4>
+            <p class="text-center text-muted mb-4">Haz clic en las personas que crees que tienen características similares</p>
+            
+            <div id="game-data" class="people-grid">
+                <div class="person-card" data-group="jovenes-madrid-tech" data-tooltip="Grupo A: Jóvenes de Madrid con intereses tecnológicos">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Juan</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-young">25 años</span>
+                        <span class="char-tag city-madrid">Madrid</span>
+                        <span class="char-tag hobby-tech">Programación</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="jovenes-madrid-tech" data-tooltip="Grupo A: Jóvenes de Madrid con intereses tecnológicos">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Ana</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-young">22 años</span>
+                        <span class="char-tag city-madrid">Madrid</span>
+                        <span class="char-tag hobby-tech">Videojuegos</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="adultos-barcelona-cultura" data-tooltip="Grupo B: Adultos de Barcelona con intereses culturales">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Carlos</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-adult">45 años</span>
+                        <span class="char-tag city-barcelona">Barcelona</span>
+                        <span class="char-tag hobby-culture">Lectura</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="adultos-barcelona-cultura" data-tooltip="Grupo B: Adultos de Barcelona con intereses culturales">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">María</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-adult">40 años</span>
+                        <span class="char-tag city-barcelona">Barcelona</span>
+                        <span class="char-tag hobby-culture">Teatro</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="jovenes-valencia-deporte" data-tooltip="Grupo C: Jóvenes de Valencia con intereses deportivos">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Luis</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-young">28 años</span>
+                        <span class="char-tag city-valencia">Valencia</span>
+                        <span class="char-tag hobby-sport">Fútbol</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="jovenes-valencia-deporte" data-tooltip="Grupo C: Jóvenes de Valencia con intereses deportivos">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Sara</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-young">26 años</span>
+                        <span class="char-tag city-valencia">Valencia</span>
+                        <span class="char-tag hobby-sport">Tenis</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="adultos-madrid-cultura" data-tooltip="Grupo D: Adultos de Madrid con intereses culturales">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Pedro</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-adult">50 años</span>
+                        <span class="char-tag city-madrid">Madrid</span>
+                        <span class="char-tag hobby-culture">Música</span>
+                    </div>
+                </div>
+                
+                <div class="person-card" data-group="jovenes-barcelona-tech" data-tooltip="Grupo E: Jóvenes de Barcelona con intereses tecnológicos">
+                    <div class="person-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="person-name">Elena</div>
+                    <div class="person-characteristics">
+                        <span class="char-tag age-young">24 años</span>
+                        <span class="char-tag city-barcelona">Barcelona</span>
+                        <span class="char-tag hobby-tech">Programación</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Indicadores de progreso -->
+            <div class="mt-3 text-center">
+                <div class="badge bg-secondary me-2">
+                    <i class="fas fa-users me-1"></i>
+                    Seleccionados: <span id="selected-count">0</span>
+                </div>
+                <div class="badge bg-info">
+                    <i class="fas fa-bullseye me-1"></i>
+                    Grupos encontrados: <span id="groups-found">0</span>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="check-game" class="btn btn-success btn-lg">
+                    <i class="fas fa-check me-2"></i>Verificar Agrupación
+                </button>
+                <button id="reset-game" class="btn btn-outline-secondary btn-lg ms-2">
+                    <i class="fas fa-refresh me-2"></i>Reiniciar
+                </button>
+                <button id="hint-game" class="btn btn-outline-info btn-lg ms-2">
+                    <i class="fas fa-lightbulb me-2"></i>Pista
+                </button>
+            </div>
+            
+            <div id="game-result" class="mt-3" style="display: none;"></div>
+        </div>
+        
+        <div class="alert alert-success mt-4">
+            <h5><i class="fas fa-brain me-2"></i>¿Qué aprenderás?</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li><strong>Patrones:</strong> Cómo identificar similitudes en datos categóricos</li>
+                        <li><strong>Agrupación:</strong> Elementos similares tienden a estar juntos</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li><strong>ACM real:</strong> Hace esto automáticamente con miles de variables</li>
+                        <li><strong>Visualización:</strong> Representa grupos en gráficos 2D</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón principal -->
+    <div class="text-center my-5">
+        <a href="{{ url_for('acm_tool') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-rocket me-3"></i>
+            Iniciar Prueba ACM
+        </a>
+        <p class="mt-3 text-muted">¡Comienza a analizar tus propios datos ahora!</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dataPoints = document.querySelectorAll('.person-card');
+    const checkButton = document.getElementById('check-game');
+    const resetButton = document.getElementById('reset-game');
+    const hintButton = document.getElementById('hint-game');
+    const resultDiv = document.getElementById('game-result');
+    const selectedCount = document.getElementById('selected-count');
+    const groupsFound = document.getElementById('groups-found');
+    
+    let selectedGroups = {};
+    let hintsUsed = 0;
+    
+    // Grupos correctos para el tutorial
+    const correctGroups = {
+        'jovenes-madrid-tech': ['Juan (25, Madrid, Programación)', 'Ana (22, Madrid, Videojuegos)'],
+        'adultos-barcelona-cultura': ['Carlos (45, Barcelona, Lectura)', 'María (40, Barcelona, Teatro)'],
+        'jovenes-valencia-deporte': ['Luis (28, Valencia, Fútbol)', 'Sara (26, Valencia, Tenis)'],
+        'adultos-madrid-cultura': ['Pedro (50, Madrid, Música)'],
+        'jovenes-barcelona-tech': ['Elena (24, Barcelona, Programación)']
+    };
+    
+    // Agregar funcionalidad de clic para las tarjetas de personas
+    dataPoints.forEach(point => {
+        point.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            updateCounters();
+            
+            // Efecto de pulso al seleccionar
+            if (this.classList.contains('selected')) {
+                this.style.animation = 'pulse 0.3s ease-in-out';
+            } else {
+                this.style.animation = '';
+            }
+        });
+    });
+    
+    function updateCounters() {
+        const selected = document.querySelectorAll('.person-card.selected');
+        selectedCount.textContent = selected.length;
+        
+        // Contar grupos únicos seleccionados
+        const uniqueGroups = new Set();
+        selected.forEach(point => {
+            uniqueGroups.add(point.dataset.group);
+        });
+        groupsFound.textContent = uniqueGroups.size;
+    }
+    
+    checkButton.addEventListener('click', function() {
+        const selected = document.querySelectorAll('.person-card.selected');
+        
+        if (selected.length < 2) {
+            showResult('¡Selecciona al menos 2 personas para formar un grupo!', 'warning');
+            return;
+        }
+        
+        // Verificar agrupaciones
+        const groups = {};
+        selected.forEach(point => {
+            const group = point.dataset.group;
+            const name = point.querySelector('.person-name').textContent.trim();
+            if (!groups[group]) groups[group] = [];
+            groups[group].push(name);
+        });
+        
+        // Análisis detallado de los grupos
+        let perfectGroups = 0;
+        let partialGroups = 0;
+        let mixedGroups = 0;
+        let totalPairs = 0;
+        
+        for (let group in groups) {
+            const groupSize = groups[group].length;
+            if (groupSize >= 2) {
+                totalPairs += groupSize;
+                
+                // Verificar si es un grupo perfecto
+                if (group === 'jovenes-madrid-tech' && groupSize === 2) {
+                    perfectGroups++;
+                } else if (group === 'adultos-barcelona-cultura' && groupSize === 2) {
+                    perfectGroups++;
+                } else if (group === 'jovenes-valencia-deporte' && groupSize === 2) {
+                    perfectGroups++;
+                } else if (groupSize > 1) {
+                    partialGroups++;
+                } else {
+                    mixedGroups++;
+                }
+            }
+        }
+        
+        // Mostrar resultados detallados
+        if (perfectGroups > 0 && mixedGroups === 0) {
+            showResult(`
+                <h5>¡Excelente trabajo!</h5>
+                <p>Has identificado <strong>${perfectGroups}</strong> grupo(s) correctamente.</p>
+                <p><strong>¿Qué significa esto?</strong></p>
+                <ul>
+                    <li>Has encontrado personas con características similares</li>
+                    <li>En el ACM real, estos grupos aparecerían cerca en el gráfico</li>
+                    <li>Cada grupo comparte 2-3 características importantes</li>
+                </ul>
+                <p class="text-success"><strong>¡Entiendes cómo funciona el ACM!</strong></p>
+            `, 'success');
+        } else if (perfectGroups > 0 || partialGroups > 0) {
+            showResult(`
+                <h5>¡Buen intento!</h5>
+                <p>Has encontrado algunos patrones correctos:</p>
+                <ul>
+                    <li>Grupos correctos: <strong>${perfectGroups}</strong></li>
+                    <li>Grupos parciales: <strong>${partialGroups}</strong></li>
+                </ul>
+                <p><strong>Consejo:</strong> Fíjate en las características que comparten: edad, ciudad y hobby.</p>
+                <p>El ACM real haría esto automáticamente con miles de variables.</p>
+            `, 'info');
+        } else {
+            showResult(`
+                <h5>¡Sigue intentando!</h5>
+                <p>No has encontrado grupos correctos, pero estás aprendiendo:</p>
+                <ul>
+                    <li>Busca personas con <strong>edad similar</strong></li>
+                    <li>Que vivan en la <strong>misma ciudad</strong></li>
+                    <li>Con <strong>hobbies relacionados</strong></li>
+                </ul>
+                <p>Consejo: Usa el botón "Pista" para ayuda.</p>
+            `, 'warning');
+        }
+    });
+    
+    hintButton.addEventListener('click', function() {
+        hintsUsed++;
+        
+        if (hintsUsed === 1) {
+            showResult(`
+                <h5>💡 Pista 1: Busca por edad</h5>
+                <p>Agrupa personas de edades similares:</p>
+                <ul>
+                    <li><strong>Jóvenes:</strong> 22-28 años</li>
+                    <li><strong>Adultos:</strong> 40-50 años</li>
+                </ul>
+                <p>¡Pero también fíjate en las otras características!</p>
+            `, 'info');
+        } else if (hintsUsed === 2) {
+            showResult(`
+                <h5>💡 Pista 2: Añade ubicación</h5>
+                <p>Dentro de cada grupo de edad, busca por ciudad:</p>
+                <ul>
+                    <li><strong>Madrid:</strong> Juan, Ana, Pedro</li>
+                    <li><strong>Barcelona:</strong> Carlos, María, Elena</li>
+                    <li><strong>Valencia:</strong> Luis, Sara</li>
+                </ul>
+                <p>¡Ya casi lo tienes!</p>
+            `, 'info');
+        } else {
+            showResult(`
+                <h5>💡 Pista 3: Grupos completos</h5>
+                <p>Los grupos ideales son:</p>
+                <ul>
+                    <li><strong>Grupo A:</strong> Juan + Ana (jóvenes Madrid + tecnología)</li>
+                    <li><strong>Grupo B:</strong> Carlos + María (adultos Barcelona + cultura)</li>
+                    <li><strong>Grupo C:</strong> Luis + Sara (jóvenes Valencia + deporte)</li>
+                </ul>
+                <p>Pedro y Elena son casos únicos en sus combinaciones.</p>
+            `, 'success');
+        }
+    });
+    
+    resetButton.addEventListener('click', function() {
+        dataPoints.forEach(point => {
+            point.classList.remove('selected');
+            point.style.animation = '';
+        });
+        resultDiv.style.display = 'none';
+        hintsUsed = 0;
+        updateCounters();
+    });
+    
+    function showResult(message, type) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'}">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+        
+        // Scroll to result
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Inicializar contadores
+    updateCounters();
+});
+</script>
+{% endblock %}

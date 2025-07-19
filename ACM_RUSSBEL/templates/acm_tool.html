@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Herramienta ACM - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-success fade-in">
+            <i class="fas fa-tools me-3"></i>
+            Herramienta de Análisis ACM
+        </h1>
+        <p class="lead text-muted">Carga tus datos y realiza un análisis de correspondencia multivariado completo</p>
+    </div>
+
+    <!-- Data Upload Section -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-upload card-icon"></i>
+            Carga de Datos
+        </h2>
+        <p class="mb-4">Sube tu archivo en formato CSV o XLSX para comenzar el análisis ACM.</p>
+        
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-area" id="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h4>Arrastra tu archivo aquí o haz clic para seleccionar</h4>
+                <p class="text-muted">Formatos soportados: CSV, XLSX (máximo 50MB)</p>
+                <input type="file" class="form-control" id="file" name="file" accept=".csv,.xlsx" style="display: none;" required>
+                <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('file').click()">
+                    <i class="fas fa-folder-open me-2"></i>Seleccionar Archivo
+                </button>
+            </div>
+            
+            <div id="file-info" class="mt-3" style="display: none;">
+                <div class="alert alert-success">
+                    <i class="fas fa-file-check me-2"></i>
+                    <strong>Archivo seleccionado:</strong> <span id="file-name"></span>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Cargar y Analizar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Specifications -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-cog card-icon"></i>
+            Especificaciones Técnicas
+        </h2>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-table me-2"></i>Formato de Datos
+                </h4>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Estructura:</strong> Matriz individuos × variables categóricas</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Formato:</strong> CSV o XLSX</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Encabezados:</strong> Primera fila debe contener nombres de variables</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Codificación:</strong> UTF-8 recomendado</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-chart-bar me-2"></i>Requisitos de Variables
+                </h4>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Tipo:</strong> Solo variables categóricas</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Cantidad:</strong> Mínimo 3 variables categóricas</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Categorías:</strong> Entre 2 y 20 categorías por variable</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Valores:</strong> Texto o números (se convertirán automáticamente)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-users me-2"></i>Requisitos de Muestra
+                </h4>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Mínimo:</strong> 50 individuos recomendado</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Óptimo:</strong> 200+ observaciones</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Ratio:</strong> Al menos 10 observaciones por variable</li>
+                    <li><i class="fas fa-check text-success me-2"></i><strong>Calidad:</strong> Datos completos preferibles</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Consideraciones
+                </h4>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-info text-info me-2"></i><strong>Valores faltantes:</strong> Se eliminarán automáticamente</li>
+                    <li><i class="fas fa-info text-info me-2"></i><strong>Categorías raras:</strong> &lt;5% pueden afectar resultados</li>
+                    <li><i class="fas fa-info text-info me-2"></i><strong>Variables numéricas:</strong> Se tratarán como categóricas</li>
+                    <li><i class="fas fa-info text-info me-2"></i><strong>Procesamiento:</strong> Puede tomar varios minutos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example Data -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-lightbulb card-icon"></i>
+            Ejemplo de Datos Válidos
+        </h2>
+        <p>Aquí tienes un ejemplo de cómo deben estructurarse tus datos:</p>
+        
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-success">
+                    <tr>
+                        <th>ID</th>
+                        <th>Edad_Grupo</th>
+                        <th>Ciudad</th>
+                        <th>Educacion</th>
+                        <th>Ocupacion</th>
+                        <th>Hobby_Principal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td>
+                        <td>Joven</td>
+                        <td>Madrid</td>
+                        <td>Universitaria</td>
+                        <td>Ingeniero</td>
+                        <td>Tecnología</td>
+                    </tr>
+                    <tr>
+                        <td>002</td>
+                        <td>Adulto</td>
+                        <td>Barcelona</td>
+                        <td>Secundaria</td>
+                        <td>Comerciante</td>
+                        <td>Deportes</td>
+                    </tr>
+                    <tr>
+                        <td>003</td>
+                        <td>Senior</td>
+                        <td>Valencia</td>
+                        <td>Universitaria</td>
+                        <td>Profesor</td>
+                        <td>Lectura</td>
+                    </tr>
+                    <tr>
+                        <td>004</td>
+                        <td>Joven</td>
+                        <td>Sevilla</td>
+                        <td>Universitaria</td>
+                        <td>Diseñador</td>
+                        <td>Arte</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-download me-2"></i>
+            <strong>Tip:</strong> Puedes descargar este ejemplo como plantilla y modificarlo con tus propios datos.
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-question-circle card-icon"></i>
+            Ayuda y Solución de Problemas
+        </h2>
+        <div class="accordion" id="helpAccordion">
+            <div class="accordion-item">
+                <h5 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                        <i class="fas fa-file-excel me-2"></i>¿Qué formatos de archivo son compatibles?
+                    </button>
+                </h5>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Los formatos soportados son:</p>
+                        <ul>
+                            <li><strong>CSV:</strong> Separado por comas, UTF-8</li>
+                            <li><strong>XLSX:</strong> Microsoft Excel 2007+</li>
+                        </ul>
+                        <p>Asegúrate de que la primera fila contenga los nombres de las variables.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h5 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                        <i class="fas fa-chart-bar me-2"></i>¿Qué tipo de variables puedo usar?
+                    </button>
+                </h5>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Solo variables categóricas o que se puedan tratar como tales:</p>
+                        <ul>
+                            <li><strong>Nominales:</strong> Género, ciudad, color favorito</li>
+                            <li><strong>Ordinales:</strong> Nivel educativo, satisfacción (bajo/medio/alto)</li>
+                            <li><strong>Numéricas agrupadas:</strong> Edad en rangos, ingresos por categorías</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h5 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                        <i class="fas fa-exclamation-triangle me-2"></i>¿Qué hacer si tengo errores?
+                    </button>
+                </h5>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Problemas comunes y soluciones:</p>
+                        <ul>
+                            <li><strong>Pocas variables:</strong> Asegúrate de tener al menos 3 variables categóricas</li>
+                            <li><strong>Muestra pequeña:</strong> Usa al menos 50 observaciones</li>
+                            <li><strong>Datos faltantes:</strong> Se eliminarán automáticamente</li>
+                            <li><strong>Categorías muy raras:</strong> Considera agrupar categorías con pocas observaciones</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file');
+    const uploadArea = document.getElementById('upload-area');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--accent-green)';
+        uploadArea.style.backgroundColor = 'rgba(144, 238, 144, 0.2)';
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary-green)';
+        uploadArea.style.backgroundColor = '';
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary-green)';
+        uploadArea.style.backgroundColor = '';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            showFileInfo(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            showFileInfo(e.target.files[0]);
+        }
+    });
+    
+    function showFileInfo(file) {
+        const validTypes = ['text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+        
+        if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.csv') && !file.name.toLowerCase().endsWith('.xlsx')) {
+            alert('Formato de archivo no válido. Use CSV o XLSX.');
+            return;
+        }
+        
+        if (file.size > 50 * 1024 * 1024) { // 50MB
+            alert('El archivo es demasiado grande. Máximo 50MB.');
+            return;
+        }
+        
+        fileName.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+        fileInfo.style.display = 'block';
+    }
+    
+    // Form validation
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            alert('Por favor, selecciona un archivo primero.');
+            return false;
+        }
+        
+        // Show loading
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<div class="spinner-custom"></div>Procesando...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

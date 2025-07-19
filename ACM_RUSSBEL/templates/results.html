@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados ACM - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-success fade-in">
+            <i class="fas fa-chart-line me-3"></i>
+            Resultados del Análisis ACM
+        </h1>
+        <p class="lead text-muted">Análisis de Correspondencia Multivariado completado exitosamente</p>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-tachometer-alt card-icon"></i>
+            Resumen del Análisis
+        </h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="metric-box">
+                    <div class="metric-value">{{ results.n_observations }}</div>
+                    <div class="metric-label">Observaciones Analizadas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-box">
+                    <div class="metric-value">{{ results.n_variables }}</div>
+                    <div class="metric-label">Variables Categóricas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-box">
+                    <div class="metric-value">{{ "%.1f"|format(results.explained_variance[0] * 100) }}%</div>
+                    <div class="metric-label">Varianza Comp. 1</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-box">
+                    <div class="metric-value">{{ "%.1f"|format(results.cumulative_variance[1] * 100) }}%</div>
+                    <div class="metric-label">Varianza Acumulada</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variables Used -->
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-list card-icon"></i>
+            Variables Incluidas en el Análisis
+        </h2>
+        <div class="row">
+            {% for column in results.selected_columns %}
+            <div class="col-md-4 mb-2">
+                <span class="badge bg-success fs-6 p-2">
+                    <i class="fas fa-tag me-2"></i>{{ column }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Variance Explained Chart -->
+    {% if 'scree' in results.plots %}
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-chart-bar card-icon"></i>
+            Varianza Explicada por Componente
+        </h2>
+        <p class="text-muted mb-4">
+            Este gráfico muestra cuánta información (varianza) captura cada componente del análisis.
+            Los primeros componentes son los más importantes.
+        </p>
+        <div class="plot-container">
+            <img src="data:image/png;base64,{{ results.plots.scree }}" alt="Gráfico de Varianza Explicada" class="img-fluid">
+        </div>
+        <div class="row mt-3">
+            {% for i in range(results.explained_variance|length) %}
+            <div class="col-md-2">
+                <div class="text-center">
+                    <div class="badge bg-success mb-1">Comp. {{ i + 1 }}</div>
+                    <div class="small">{{ "%.1f"|format(results.explained_variance[i] * 100) }}%</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Biplot -->
+    {% if 'biplot' in results.plots %}
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-chart-scatter card-icon"></i>
+            Biplot - Mapa de Correspondencias
+        </h2>
+        <p class="text-muted mb-4">
+            Este gráfico muestra la distribución de tus observaciones en el espacio reducido. 
+            Puntos cercanos indican observaciones con características similares.
+        </p>
+        <div class="plot-container">
+            <img src="data:image/png;base64,{{ results.plots.biplot }}" alt="Biplot ACM" class="img-fluid">
+        </div>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Interpretación:</strong> 
+            <ul class="mb-0 mt-2">
+                <li>Puntos cercanos representan observaciones con perfiles similares</li>
+                <li>La distancia del centro indica qué tan "típica" es una observación</li>
+                <li>Los ejes representan las dimensiones principales de variación</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Distribution Plots -->
+    {% if 'distribution' in results.plots %}
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-chart-pie card-icon"></i>
+            Distribución de Variables Categóricas
+        </h2>
+        <p class="text-muted mb-4">
+            Frecuencia de cada categoría en las variables analizadas. Esto ayuda a entender 
+            la estructura de tus datos antes del análisis ACM.
+        </p>
+        <div class="plot-container">
+            <img src="data:image/png;base64,{{ results.plots.distribution }}" alt="Distribuciones de Variables" class="img-fluid">
+        </div>
+        <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Nota:</strong> Categorías con muy pocas observaciones (menos del 5%) pueden afectar 
+            la estabilidad del análisis ACM.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Interpretation Guide -->
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-compass card-icon"></i>
+            Guía de Interpretación
+        </h2>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-eye me-2"></i>¿Qué Buscar?
+                </h4>
+                <ul>
+                    <li><strong>Agrupaciones:</strong> Conjuntos de puntos cercanos en el biplot</li>
+                    <li><strong>Patrones:</strong> Direcciones principales de variación</li>
+                    <li><strong>Outliers:</strong> Puntos alejados del centro o grupos principales</li>
+                    <li><strong>Varianza:</strong> Los primeros 2-3 componentes deben explicar >50% de la varianza</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">
+                    <i class="fas fa-lightbulb me-2"></i>Aplicaciones Prácticas
+                </h4>
+                <ul>
+                    <li><strong>Segmentación:</strong> Identificar grupos homogéneos en tus datos</li>
+                    <li><strong>Perfiles:</strong> Caracterizar diferentes tipos de observaciones</li>
+                    <li><strong>Reducción:</strong> Simplificar análisis posteriores</li>
+                    <li><strong>Visualización:</strong> Explorar relaciones complejas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Results Table -->
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-table card-icon"></i>
+            Resultados Detallados
+        </h2>
+        
+        <!-- Variance Table -->
+        <h4 class="text-success mb-3">Varianza Explicada por Componente</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-success">
+                    <tr>
+                        <th>Componente</th>
+                        <th>Varianza Individual (%)</th>
+                        <th>Varianza Acumulada (%)</th>
+                        <th>Importancia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(results.explained_variance|length) %}
+                    <tr>
+                        <td><strong>{{ i + 1 }}</strong></td>
+                        <td>{{ "%.2f"|format(results.explained_variance[i] * 100) }}%</td>
+                        <td>{{ "%.2f"|format(results.cumulative_variance[i] * 100) }}%</td>
+                        <td>
+                            {% if results.explained_variance[i] > 0.3 %}
+                                <span class="badge bg-success">Alta</span>
+                            {% elif results.explained_variance[i] > 0.15 %}
+                                <span class="badge bg-warning">Media</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Baja</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Quality Assessment -->
+        <h4 class="text-success mb-3 mt-4">Evaluación de Calidad del Análisis</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="metric-box">
+                    {% set quality_score = results.cumulative_variance[1] * 100 %}
+                    <div class="metric-value {% if quality_score >= 70 %}text-success{% elif quality_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                        {% if quality_score >= 70 %}Excelente{% elif quality_score >= 50 %}Buena{% else %}Regular{% endif %}
+                    </div>
+                    <div class="metric-label">Calidad General</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-box">
+                    {% set sample_adequacy = "Adecuada" if results.n_observations >= 200 else "Suficiente" if results.n_observations >= 50 else "Limitada" %}
+                    <div class="metric-value {% if results.n_observations >= 200 %}text-success{% elif results.n_observations >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ sample_adequacy }}
+                    </div>
+                    <div class="metric-label">Tamaño de Muestra</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-box">
+                    {% set complexity = "Simple" if results.n_variables <= 5 else "Moderada" if results.n_variables <= 8 else "Compleja" %}
+                    <div class="metric-value {% if results.n_variables <= 5 %}text-success{% elif results.n_variables <= 8 %}text-warning{% else %}text-info{% endif %}">
+                        {{ complexity }}
+                    </div>
+                    <div class="metric-label">Complejidad</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="results-card slide-up">
+        <h2>
+            <i class="fas fa-thumbs-up card-icon"></i>
+            Recomendaciones y Próximos Pasos
+        </h2>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">Recomendaciones</h4>
+                {% set variance_2comp = results.cumulative_variance[1] * 100 %}
+                {% if variance_2comp >= 70 %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Excelente resultado:</strong> Los primeros 2 componentes explican {{ "%.1f"|format(variance_2comp) }}% 
+                    de la varianza. El análisis es muy informativo.
+                </div>
+                {% elif variance_2comp >= 50 %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Resultado aceptable:</strong> Considera incluir un tercer componente para capturar más información.
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Considera:</strong> Revisar las variables seleccionadas o aumentar el número de componentes.
+                </div>
+                {% endif %}
+                
+                {% if results.n_observations < 100 %}
+                <div class="alert alert-info">
+                    <i class="fas fa-users me-2"></i>
+                    <strong>Muestra pequeña:</strong> Considera recopilar más datos para resultados más robustos.
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+                <h4 class="text-success mb-3">Próximos Pasos</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-search text-success me-2"></i>
+                        <strong>Explora los grupos:</strong> Identifica patrones en el biplot
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-users text-success me-2"></i>
+                        <strong>Segmenta:</strong> Usa los resultados para agrupar observaciones
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-chart-line text-success me-2"></i>
+                        <strong>Analiza:</strong> Profundiza en las características de cada grupo
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-cog text-success me-2"></i>
+                        <strong>Optimiza:</strong> Ajusta variables o parámetros si es necesario
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center my-5">
+        <a href="{{ url_for('acm_tool') }}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-plus me-2"></i>
+            Nuevo Análisis
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-success btn-lg me-3">
+            <i class="fas fa-print me-2"></i>
+            Imprimir Resultados
+        </button>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-home me-2"></i>
+            Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling to all internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+    
+    // Add tooltips to metric boxes
+    const metricBoxes = document.querySelectorAll('.metric-box');
+    metricBoxes.forEach(box => {
+        box.setAttribute('data-bs-toggle', 'tooltip');
+        const label = box.querySelector('.metric-label').textContent;
+        
+        let tooltipText = '';
+        switch(label) {
+            case 'Observaciones Analizadas':
+                tooltipText = 'Número total de filas procesadas en el análisis';
+                break;
+            case 'Variables Categóricas':
+                tooltipText = 'Número de variables incluidas en el ACM';
+                break;
+            case 'Varianza Comp. 1':
+                tooltipText = 'Porcentaje de información explicada por el primer componente';
+                break;
+            case 'Varianza Acumulada':
+                tooltipText = 'Información total explicada por los primeros 2 componentes';
+                break;
+        }
+        
+        if (tooltipText) {
+            box.setAttribute('title', tooltipText);
+        }
+    });
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Add click-to-zoom functionality for plots
+    const plotImages = document.querySelectorAll('.plot-container img');
+    plotImages.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            // Create modal for larger view
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Vista Ampliada</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${this.src}" class="img-fluid" alt="${this.alt}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+            
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(modal);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

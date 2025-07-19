@@ -1,0 +1,27 @@
+INSTALACIÓN SIMPLE - APLICACIÓN ACM
+================================
+
+PROBLEMA: "Missing optional dependency 'openpyxl'"
+SOLUCIÓN: Sigue estos pasos
+
+1. OPCIÓN MÁS FÁCIL - Script automático:
+   python install.py
+
+2. OPCIÓN MANUAL - Con requirements:
+   pip install -r requirements_project.txt
+
+3. OPCIÓN BÁSICA - Una línea:
+   pip install Flask pandas numpy scikit-learn matplotlib seaborn openpyxl Werkzeug
+
+4. VERIFICAR que todo esté instalado:
+   python verificar_instalacion.py
+
+5. EJECUTAR la aplicación:
+   python app.py
+
+NOTA: Si sigues teniendo el error de openpyxl después de estos pasos:
+- Verifica que estés usando el mismo entorno Python
+- Si usas virtual environment, asegúrate de que esté activado
+- Reinstala específicamente: pip install --upgrade openpyxl
+
+¡Listo! Tu aplicación ACM funcionará perfectamente.

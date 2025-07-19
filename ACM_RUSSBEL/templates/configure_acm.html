@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración ACM - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-success fade-in">
+            <i class="fas fa-cogs me-3"></i>
+            Configuración del Análisis ACM
+        </h1>
+        <p class="lead text-muted">Personaliza los parámetros para tu análisis de correspondencia multivariado</p>
+    </div>
+
+    <!-- File Info -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-file-check card-icon"></i>
+            Información del Archivo
+        </h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="metric-box">
+                    <div class="metric-value">{{ filename }}</div>
+                    <div class="metric-label">Archivo Cargado</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-box">
+                    <div class="metric-value">{{ num_rows }}</div>
+                    <div class="metric-label">Observaciones</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-box">
+                    <div class="metric-value">{{ columns|length }}</div>
+                    <div class="metric-label">Variables Categóricas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form action="{{ url_for('analyze_acm') }}" method="post" id="config-form">
+        <div class="info-card slide-up">
+            <h2>
+                <i class="fas fa-sliders-h card-icon"></i>
+                Selección de Variables
+            </h2>
+            <p class="mb-4">Selecciona las variables categóricas que deseas incluir en el análisis ACM (mínimo 3):</p>
+            
+            <div class="row">
+                {% for column in columns %}
+                <div class="col-md-4 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="columns" value="{{ column }}" 
+                               id="col_{{ loop.index }}" {% if loop.index <= 5 %}checked{% endif %}>
+                        <label class="form-check-label" for="col_{{ loop.index }}">
+                            <strong>{{ column }}</strong>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Recomendación:</strong> Selecciona entre 3 y 8 variables para obtener resultados más interpretables.
+                Muchas variables pueden hacer el análisis más complejo.
+            </div>
+        </div>
+
+        <div class="info-card slide-up">
+            <h2>
+                <i class="fas fa-chart-line card-icon"></i>
+                Parámetros del Análisis
+            </h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label for="n_components" class="form-label">
+                            <i class="fas fa-layer-group me-2"></i>
+                            <strong>Número de Componentes</strong>
+                        </label>
+                        <select class="form-select" id="n_components" name="n_components">
+                            <option value="2" selected>2 componentes (recomendado)</option>
+                            <option value="3">3 componentes</option>
+                            <option value="4">4 componentes</option>
+                            <option value="5">5 componentes</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-lightbulb text-warning me-1"></i>
+                            2 componentes permiten visualización en 2D. Más componentes capturan más varianza.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label for="analysis_type" class="form-label">
+                            <i class="fas fa-microscope me-2"></i>
+                            <strong>Tipo de Análisis</strong>
+                        </label>
+                        <select class="form-select" id="analysis_type" name="analysis_type">
+                            <option value="standard" selected>Estándar (recomendado)</option>
+                            <option value="normalized">Normalizado</option>
+                            <option value="weighted">Ponderado</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle text-info me-1"></i>
+                            El análisis estándar es adecuado para la mayoría de casos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card slide-up">
+            <h2>
+                <i class="fas fa-chart-area card-icon"></i>
+                Opciones de Visualización
+            </h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-success mb-3">Gráficos a Generar</h4>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="plot_biplot" name="plots" value="biplot" checked>
+                        <label class="form-check-label" for="plot_biplot">
+                            <i class="fas fa-chart-scatter me-2"></i>
+                            <strong>Biplot</strong> - Gráfico de dispersión principal
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="plot_scree" name="plots" value="scree" checked>
+                        <label class="form-check-label" for="plot_scree">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            <strong>Scree Plot</strong> - Varianza explicada por componente
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="plot_distribution" name="plots" value="distribution" checked>
+                        <label class="form-check-label" for="plot_distribution">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            <strong>Distribuciones</strong> - Frecuencias de categorías
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h4 class="text-success mb-3">Configuración Visual</h4>
+                    <div class="mb-3">
+                        <label for="plot_size" class="form-label">Tamaño de Gráficos</label>
+                        <select class="form-select" id="plot_size" name="plot_size">
+                            <option value="small">Pequeño (800x600)</option>
+                            <option value="medium" selected>Mediano (1000x800)</option>
+                            <option value="large">Grande (1200x1000)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="color_scheme" class="form-label">Esquema de Colores</label>
+                        <select class="form-select" id="color_scheme" name="color_scheme">
+                            <option value="green" selected>Verde (tema actual)</option>
+                            <option value="viridis">Viridis</option>
+                            <option value="plasma">Plasma</option>
+                            <option value="coolwarm">Frío-Cálido</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card slide-up">
+            <h2>
+                <i class="fas fa-cog card-icon"></i>
+                Configuración Avanzada
+            </h2>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remove_outliers" name="remove_outliers" checked>
+                        <label class="form-check-label" for="remove_outliers">
+                            <i class="fas fa-filter me-2"></i>
+                            <strong>Filtrar valores atípicos</strong>
+                        </label>
+                        <div class="form-text">Elimina observaciones extremas automáticamente</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show_contributions" name="show_contributions" checked>
+                        <label class="form-check-label" for="show_contributions">
+                            <i class="fas fa-percentage me-2"></i>
+                            <strong>Mostrar contribuciones</strong>
+                        </label>
+                        <div class="form-text">Incluye análisis de contribuciones por variable</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="detailed_output" name="detailed_output" checked>
+                        <label class="form-check-label" for="detailed_output">
+                            <i class="fas fa-list-alt me-2"></i>
+                            <strong>Resultados detallados</strong>
+                        </label>
+                        <div class="form-text">Genera tablas y métricas adicionales</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center my-5">
+            <button type="submit" class="btn btn-success btn-lg me-3" id="analyze-btn">
+                <i class="fas fa-play me-2"></i>
+                Ejecutar Análisis ACM
+            </button>
+            <a href="{{ url_for('acm_tool') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>
+                Cargar Otro Archivo
+            </a>
+        </div>
+    </form>
+
+    <!-- Processing Info -->
+    <div class="info-card slide-up">
+        <h2>
+            <i class="fas fa-clock card-icon"></i>
+            Información de Procesamiento
+        </h2>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-hourglass-start text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Tiempo Estimado</h4>
+                <p>{% if num_rows < 100 %}30 segundos{% elif num_rows < 500 %}1-2 minutos{% else %}2-5 minutos{% endif %}</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-memory text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Uso de Memoria</h4>
+                <p>{% if num_rows < 1000 %}Bajo{% elif num_rows < 5000 %}Moderado{% else %}Alto{% endif %}</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-chart-line text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Complejidad</h4>
+                <p>{% if columns|length < 5 %}Simple{% elif columns|length < 8 %}Moderada{% else %}Compleja{% endif %}</p>
+            </div>
+        </div>
+        
+        <div class="alert alert-warning mt-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Nota importante:</strong> El procesamiento puede tomar varios minutos dependiendo del tamaño de tus datos. 
+            Por favor, no cierres la ventana durante el análisis.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('config-form');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const checkboxes = document.querySelectorAll('input[name="columns"]');
+    
+    // Validation function
+    function validateForm() {
+        const selectedColumns = document.querySelectorAll('input[name="columns"]:checked');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        
+        if (selectedColumns.length < 3) {
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Selecciona al menos 3 variables';
+            analyzeBtn.classList.remove('btn-success');
+            analyzeBtn.classList.add('btn-warning');
+        } else {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<i class="fas fa-play me-2"></i>Ejecutar Análisis ACM';
+            analyzeBtn.classList.remove('btn-warning');
+            analyzeBtn.classList.add('btn-success');
+        }
+    }
+    
+    // Add event listeners to checkboxes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', validateForm);
+    });
+    
+    // Initial validation
+    validateForm();
+    
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        const selectedColumns = document.querySelectorAll('input[name="columns"]:checked');
+        
+        if (selectedColumns.length < 3) {
+            e.preventDefault();
+            alert('Por favor, selecciona al menos 3 variables categóricas para el análisis.');
+            return false;
+        }
+        
+        // Show loading state
+        analyzeBtn.innerHTML = '<div class="spinner-custom"></div>Procesando Análisis...';
+        analyzeBtn.disabled = true;
+        
+        // Show processing message
+        const processingAlert = document.createElement('div');
+        processingAlert.className = 'alert alert-info mt-3';
+        processingAlert.innerHTML = `
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <strong>Procesando...</strong> El análisis ACM está en curso. Esto puede tomar varios minutos.
+        `;
+        form.appendChild(processingAlert);
+    });
+    
+    // Select all/none functionality
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.type = 'button';
+    selectAllBtn.className = 'btn btn-outline-success btn-sm me-2';
+    selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>Seleccionar Todo';
+    
+    const selectNoneBtn = document.createElement('button');
+    selectNoneBtn.type = 'button';
+    selectNoneBtn.className = 'btn btn-outline-secondary btn-sm';
+    selectNoneBtn.innerHTML = '<i class="fas fa-square me-1"></i>Deseleccionar Todo';
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'mb-3';
+    buttonContainer.appendChild(selectAllBtn);
+    buttonContainer.appendChild(selectNoneBtn);
+    
+    // Find the variables section by searching through h2 elements
+    const h2Elements = document.querySelectorAll('.info-card h2');
+    let variablesSection = null;
+    h2Elements.forEach(h2 => {
+        if (h2.textContent.includes('Selección de Variables')) {
+            variablesSection = h2.parentNode;
+        }
+    });
+    
+    if (variablesSection) {
+        variablesSection.insertBefore(buttonContainer, variablesSection.querySelector('.row'));
+    }
+    
+    selectAllBtn.addEventListener('click', function() {
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+        validateForm();
+    });
+    
+    selectNoneBtn.addEventListener('click', function() {
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+        validateForm();
+    });
+});
+</script>
+{% endblock %}
